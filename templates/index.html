@@ -18,9 +18,30 @@
             }
         }
     </script>
+    <style>
+        /* Custom styles for clearer focus and animations if needed beyond Tailwind */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        /* Style for the market table (optional, can be done with Tailwind) */
+        .market-table th, .market-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0; /* Tailwind border-b-gray-200 */
+        }
+        .market-table th {
+            background-color: #f8fafc; /* Tailwind bg-gray-50 */
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-500 to-purple-600 min-h-screen p-4 flex items-center justify-center font-sans">
-    <div class="container bg-white rounded-xl shadow-2xl overflow-hidden max-w-3xl w-full mx-auto my-8">
+    <div class="container bg-white rounded-xl shadow-2xl overflow-hidden max-w-4xl w-full mx-auto my-8">
         <div class="header bg-gradient-to-br from-gray-800 to-blue-500 text-white p-8 text-center rounded-t-xl">
             <h1 class="text-4xl font-bold mb-2">🎯 Dự Đoán Lương Nhân Viên</h1>
             <p class="opacity-90 text-lg">Sử dụng Machine Learning và AI để dự đoán mức lương phù hợp</p>
@@ -102,23 +123,23 @@
                     </div>
                 </div>
 
-                <!-- Hàng 4: Checkboxes và Tỷ lệ phụ cấp -->
+                <!-- Hàng 4: Checkboxes và Tỷ lệ phụ cấp (có hiển thị phần trăm) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-group flex flex-col justify-around">
                         <div class="flex items-center space-x-3 mb-4">
                             <input type="checkbox" id="certificate" name="certificate" value="1"
                                    class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                            <label for="certificate" class="text-gray-700 font-medium text-lg">📜 Có chứng chỉ nghề nghiệp</label>
+                            <label for="certificate" class="text-gray-700 font-medium text-lg">📜 Có chứng chỉ nghề nghiệp <span id="cert_impact" class="text-sm text-blue-600">(+7% lương)</span></label>
                         </div>
                         <div class="flex items-center space-x-3 mb-4">
                             <input type="checkbox" id="night_shift" name="night_shift" value="1"
                                    class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                            <label for="night_shift" class="text-gray-700 font-medium text-lg">🌙 Làm ca đêm</label>
+                            <label for="night_shift" class="text-gray-700 font-medium text-lg">🌙 Làm ca đêm <span id="night_impact" class="text-sm text-blue-600">(+30% lương)</span></label>
                         </div>
                         <div class="flex items-center space-x-3">
                             <input type="checkbox" id="overtime" name="overtime" value="1"
                                    class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                            <label for="overtime" class="text-gray-700 font-medium text-lg">⏰ Làm thêm giờ</label>
+                            <label for="overtime" class="text-gray-700 font-medium text-lg">⏰ Làm thêm giờ <span id="overtime_impact" class="text-sm text-blue-600">(+50% lương)</span></label>
                         </div>
                     </div>
 
@@ -126,7 +147,7 @@
                         <div class="flex items-center space-x-3 mb-4">
                             <input type="checkbox" id="special_skills" name="special_skills" value="1"
                                    class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                            <label for="special_skills" class="text-gray-700 font-medium text-lg">🥋 Có kỹ năng đặc thù (Võ thuật, PCCC)</label>
+                            <label for="special_skills" class="text-gray-700 font-medium text-lg">🥋 Có kỹ năng đặc thù <span id="skills_impact" class="text-sm text-blue-600">(Khoảng +2tr đến +5tr VND)</span></label>
                         </div>
                         <label for="allowances_percentage" class="block text-gray-700 font-semibold mb-2 text-lg">💰 Tỷ lệ phụ cấp/phúc lợi (%):</label>
                         <input type="number" id="allowances_percentage" name="allowances_percentage" min="0" max="30" step="0.1" value="0"
@@ -159,14 +180,124 @@
                 <h3 class="text-2xl font-bold text-green-700 mb-4">💰 Kết Quả Dự Đoán</h3>
                 <div id="resultContent" class="space-y-3"></div>
             </div>
+
+            <!-- Bảng giá thị trường -->
+            <div class="market-comparison mt-8 p-6 bg-white border-l-4 border-yellow-500 rounded-lg shadow-md">
+                <h3 class="text-2xl font-bold text-yellow-700 mb-4">📈 So Sánh Lương Thị Trường (Tham khảo)</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg market-table">
+                        <thead>
+                            <tr>
+                                <th class="py-3 px-4 uppercase text-sm text-gray-600 border-b border-gray-300">Khu vực</th>
+                                <th class="py-3 px-4 uppercase text-sm text-gray-600 border-b border-gray-300">Trình độ</th>
+                                <th class="py-3 px-4 uppercase text-sm text-gray-600 border-b border-gray-300">Kinh nghiệm</th>
+                                <th class="py-3 px-4 uppercase text-sm text-gray-600 border-b border-gray-300">Mức lương trung bình</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marketTableBody">
+                            <!-- Dữ liệu thị trường sẽ được thêm vào đây bằng JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <p id="marketComparisonNote" class="mt-4 text-gray-600 text-sm italic"></p>
+            </div>
+
         </div>
     </div>
 
     <script>
         // Hàm định dạng tiền tệ
         const formatCurrency = (amount) => {
+            if (typeof amount !== 'number') return 'N/A'; // Handle non-numeric input
             return Number(amount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
         };
+
+        // Dữ liệu thị trường giả định cho mục đích minh họa
+        // Dữ liệu này chỉ mang tính chất tham khảo và được đơn giản hóa
+        const marketData = {
+            "Vùng I (TP.HCM, Hà Nội)": {
+                "THCS": { "0-2 năm": 4000000, "3-5 năm": 5000000, "6-10 năm": 6000000 },
+                "THPT": { "0-2 năm": 5000000, "3-5 năm": 6500000, "6-10 năm": 8000000 },
+                "CĐ": { "0-2 năm": 6500000, "3-5 năm": 8500000, "6-10 năm": 10500000 },
+                "ĐH": { "0-2 năm": 8000000, "3-5 năm": 11000000, "6-10 năm": 15000000 }
+            },
+            "Vùng II (TP. Đà Nẵng, Hải Phòng)": {
+                "THCS": { "0-2 năm": 3800000, "3-5 năm": 4800000, "6-10 năm": 5800000 },
+                "THPT": { "0-2 năm": 4800000, "3-5 năm": 6200000, "6-10 năm": 7700000 },
+                "CĐ": { "0-2 năm": 6000000, "3-5 năm": 8000000, "6-10 năm": 10000000 },
+                "ĐH": { "0-2 năm": 7500000, "3-5 năm": 10500000, "6-10 năm": 14000000 }
+            },
+            "Vùng III (TP. Buôn Ma Thuột, Huế)": {
+                "THCS": { "0-2 năm": 3500000, "3-5 năm": 4500000, "6-10 năm": 5500000 },
+                "THPT": { "0-2 năm": 4500000, "3-5 năm": 5800000, "6-10 năm": 7200000 },
+                "CĐ": { "0-2 năm": 5700000, "3-5 năm": 7500000, "6-10 năm": 9500000 },
+                "ĐH": { "0-2 năm": 7000000, "3-5 năm": 9500000, "6-10 năm": 13000000 }
+            },
+            "Vùng IV (Nông thôn)": {
+                "THCS": { "0-2 năm": 3200000, "3-5 năm": 4200000, "6-10 năm": 5200000 },
+                "THPT": { "0-2 năm": 4200000, "3-5 năm": 5500000, "6-10 năm": 6800000 },
+                "CĐ": { "0-2 năm": 5300000, "3-5 năm": 7000000, "6-10 năm": 9000000 },
+                "ĐH": { "0-2 năm": 6500000, "3-5 năm": 9000000, "6-10 năm": 12000000 }
+            }
+        };
+
+        function getExperienceRange(experience) {
+            if (experience >= 0 && experience <= 2) return "0-2 năm";
+            if (experience >= 3 && experience <= 5) return "3-5 năm";
+            if (experience >= 6 && experience <= 10) return "6-10 năm";
+            return "Ngoài phạm vi"; // For experience > 10
+        }
+
+        // Hàm hiển thị bảng so sánh thị trường
+        function displayMarketComparison(inputData, predicted_salary) {
+            const marketTableBody = document.getElementById('marketTableBody');
+            const marketComparisonNote = document.getElementById('marketComparisonNote');
+            marketTableBody.innerHTML = ''; // Clear previous results
+
+            const selectedArea = inputData.work_area;
+            const selectedEdu = inputData.education;
+            const selectedExpRange = getExperienceRange(inputData.experience);
+
+            let foundMarketSalary = null;
+
+            if (marketData[selectedArea] && marketData[selectedArea][selectedEdu] && marketData[selectedArea][selectedEdu][selectedExpRange]) {
+                foundMarketSalary = marketData[selectedArea][selectedEdu][selectedExpRange];
+
+                const row = `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-2 px-4 text-gray-700">${selectedArea}</td>
+                        <td class="py-2 px-4 text-gray-700">${selectedEdu}</td>
+                        <td class="py-2 px-4 text-gray-700">${selectedExpRange}</td>
+                        <td class="py-2 px-4 text-gray-900 font-bold">${formatCurrency(foundMarketSalary)}</td>
+                    </tr>
+                `;
+                marketTableBody.innerHTML = row;
+            } else {
+                marketTableBody.innerHTML = `<tr><td colspan="4" class="py-2 px-4 text-center text-gray-500">Không tìm thấy dữ liệu thị trường tham khảo cho các tiêu chí đã chọn.</td></tr>`;
+            }
+
+            // So sánh với mức lương dự đoán
+            if (foundMarketSalary !== null && predicted_salary !== null) {
+                const diff = predicted_salary - foundMarketSalary;
+                const percentageDiff = (diff / foundMarketSalary) * 100;
+                let comparisonText = '';
+                if (diff > 0) {
+                    comparisonText = `Mức lương dự đoán của bạn (${formatCurrency(predicted_salary)}) cao hơn thị trường khoảng ${percentageDiff.toFixed(1)}%.`;
+                    marketComparisonNote.className = 'mt-4 text-green-600 text-sm italic font-semibold';
+                } else if (diff < 0) {
+                    comparisonText = `Mức lương dự đoán của bạn (${formatCurrency(predicted_salary)}) thấp hơn thị trường khoảng ${Math.abs(percentageDiff).toFixed(1)}%.`;
+                    marketComparisonNote.className = 'mt-4 text-red-600 text-sm italic font-semibold';
+                } else {
+                    comparisonText = `Mức lương dự đoán của bạn (${formatCurrency(predicted_salary)}) tương đương với thị trường.`;
+                    marketComparisonNote.className = 'mt-4 text-blue-600 text-sm italic font-semibold';
+                }
+                marketComparisonNote.textContent = comparisonText;
+            } else {
+                marketComparisonNote.textContent = 'Không thể so sánh với thị trường do thiếu dữ liệu hoặc lỗi.';
+                marketComparisonNote.className = 'mt-4 text-gray-600 text-sm italic';
+            }
+        }
+
 
         // Hàm hiển thị kết quả dự đoán thành công
         function displayResult(data) {
@@ -235,6 +366,9 @@
             resultDiv.classList.remove('hidden'); // Hiển thị khối kết quả
             resultDiv.classList.remove('bg-red-50', 'border-red-500'); // Đảm bảo không có styling lỗi
             resultDiv.classList.add('bg-green-50', 'border-green-500'); // Thêm styling thành công
+
+            // Gọi hàm hiển thị so sánh thị trường
+            displayMarketComparison(data, data.predicted_salary);
         }
 
         // Hàm hiển thị thông báo lỗi
@@ -246,6 +380,9 @@
             resultDiv.classList.remove('hidden'); // Hiển thị khối kết quả (với nội dung lỗi)
             resultDiv.classList.remove('bg-green-50', 'border-green-500'); // Xóa styling thành công
             resultDiv.classList.add('bg-red-50', 'border-red-500'); // Thêm styling lỗi
+            
+            // Ẩn bảng so sánh thị trường khi có lỗi
+            document.querySelector('.market-comparison').classList.add('hidden');
         }
 
         document.getElementById('predictionForm').addEventListener('submit', async function(e) {
@@ -275,6 +412,7 @@
 
             document.getElementById('result').classList.add('hidden');
             document.getElementById('result').classList.remove('error'); // Xóa lớp error nếu có
+            document.querySelector('.market-comparison').classList.add('hidden'); // Ẩn bảng thị trường
 
             let predicted_salary_ml_only;
             let ai_adjustment_percentage = 0;
@@ -331,7 +469,7 @@
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
                     if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY_HERE') { // Kiểm tra nếu API Key không hợp lệ
-                        throw new Error("API Key cho Gemini AI chưa được cung cấp hoặc không hợp lệ. Vui lòng kiểm tra file .env và khởi động lại server.");
+                        throw new Error("API Key cho Gemini AI chưa được cung cấp. Vui lòng kiểm tra file .env và khởi động lại server.");
                     }
 
                     const ai_response = await fetch(apiUrl, {

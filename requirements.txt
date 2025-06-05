@@ -6,4 +6,5 @@ pandas
 numpy
 scikit-learn
 flask
+Flask[async]
 python-dotenv
